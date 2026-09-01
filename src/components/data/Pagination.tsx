@@ -12,7 +12,7 @@ export default function Pagination({
   const pages = Math.max(1, Math.ceil(total / pageSize))
   if (pages <= 1) return null
   return (
-    <div className="flex items-center justify-between text-sm text-slate-500">
+    <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
       <span>
         {Math.min((page - 1) * pageSize + 1, total)}–{Math.min(page * pageSize, total)} of {total}
       </span>
@@ -21,7 +21,11 @@ export default function Pagination({
           <button
             key={i}
             onClick={() => onChange(i + 1)}
-            className={`h-8 w-8 rounded ${page === i + 1 ? 'bg-indigo-600 text-white' : 'hover:bg-slate-100'}`}
+            className={`h-8 w-8 rounded transition-colors ${
+              page === i + 1
+                ? 'bg-indigo-600 text-white'
+                : 'hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'
+            }`}
           >
             {i + 1}
           </button>

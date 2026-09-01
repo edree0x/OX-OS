@@ -33,9 +33,9 @@ export function notify(message: string, type: ToastType = 'success') {
 
 const ICONS: Record<ToastType, string> = { success: 'check', error: 'alert', info: 'sparkles' }
 const TONES: Record<ToastType, string> = {
-  success: 'border-green-200 bg-green-50 text-green-700',
-  error: 'border-red-200 bg-red-50 text-red-700',
-  info: 'border-indigo-200 bg-indigo-50 text-indigo-700',
+  success: 'border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-300',
+  error: 'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300',
+  info: 'border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950 dark:text-indigo-300',
 }
 
 export function Toaster() {

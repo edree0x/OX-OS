@@ -29,6 +29,14 @@ const statusBadge = (options: string[], tones: FieldSchema['statuses'] = []) => 
   statuses: tones,
 })
 
+const categoriesEntity = (): EntitySchema =>
+  ent('categories', 'Category', 'tag', [
+    f('name', 'Name', 'text', { required: true }),
+    f('description', 'Description', 'textarea'),
+    f('color', 'Color', 'text', { placeholder: '#6366f1' }),
+    { key: 'active', label: 'Active', type: 'checkbox' },
+  ])
+
 export const APP_SECTORS: Record<string, SectorPreset> = {
   supermarket: {
     id: 'supermarket',
@@ -42,11 +50,12 @@ export const APP_SECTORS: Record<string, SectorPreset> = {
       ent('products', 'Product', 'box', [
         f('name', 'Name', 'text', { required: true }),
         f('sku', 'SKU', 'text'),
-        f('category', 'Category', 'select', { options: ['Grocery', 'Produce', 'Electronics', 'Beverages'] }),
+        f('category', 'Category', 'select', { entityRef: 'categories' }),
         f('price', 'Price', 'number', { required: true }),
         f('stock', 'Stock', 'number', { required: true }),
         f('active', 'Active', 'checkbox'),
       ], true),
+      categoriesEntity(),
       ent('suppliers', 'Supplier', 'truck', [
         f('name', 'Name', 'text', { required: true }),
         f('contact', 'Contact', 'text'),
@@ -56,6 +65,10 @@ export const APP_SECTORS: Record<string, SectorPreset> = {
         f('name', 'Name', 'text', { required: true }),
         f('email', 'Email', 'email'),
         f('phone', 'Phone', 'text'),
+        f('address', 'Address', 'text'),
+        f('customerType', 'Customer Type', 'select', { options: ['Regular', 'VIP', 'Wholesale'] }),
+        f('loyaltyPoints', 'Loyalty Points', 'number'),
+        f('notes', 'Notes', 'textarea'),
       ]),
       ent('sales', 'Sale', 'receipt', [
         f('customer', 'Customer', 'text', { required: true }),
@@ -70,6 +83,47 @@ export const APP_SECTORS: Record<string, SectorPreset> = {
       { id: 'w3', kind: 'stats', title: 'Total Sales', metric: 'sum:sales.total' },
       { id: 'w4', kind: 'chart', title: 'Sales (7d)', metric: 'series7:sales.date' },
       { id: 'w5', kind: 'list', title: 'Recent Sales', metric: 'recent:sales.5' },
+    ],
+  },
+
+  grocery: {
+    id: 'grocery',
+    label: 'Grocery Store',
+    icon: 'cart',
+    description: 'Bakery, produce, simple inventory and fast checkout.',
+    features: { auth: true, reports: true, pos: true, rbac: true },
+    views: ['pos'],
+    posEntityId: 'products',
+    entities: [
+      ent('products', 'Product', 'box', [
+        f('name', 'Name', 'text', { required: true }),
+        f('category', 'Category', 'select', { entityRef: 'categories' }),
+        f('price', 'Price', 'number', { required: true }),
+        f('stock', 'Stock', 'number', { required: true }),
+        f('active', 'Active', 'checkbox'),
+      ], true),
+      categoriesEntity(),
+      ent('suppliers', 'Supplier', 'truck', [f('name', 'Name', 'text', { required: true }), f('contact', 'Contact', 'text'), f('email', 'Email', 'email')]),
+      ent('customers', 'Customer', 'users', [
+        f('name', 'Name', 'text', { required: true }),
+        f('phone', 'Phone', 'text'),
+        f('email', 'Email', 'email'),
+        f('customerType', 'Customer Type', 'select', { options: ['Regular', 'VIP', 'Wholesale'] }),
+        f('loyaltyPoints', 'Loyalty Points', 'number'),
+        f('notes', 'Notes', 'textarea'),
+      ]),
+      ent('sales', 'Sale', 'receipt', [
+        f('customer', 'Customer', 'text'),
+        f('total', 'Total', 'number', { required: true }),
+        f('date', 'Date', 'date', { required: true }),
+        f('payment', 'Payment', 'select', { options: ['Cash', 'Card', 'Wallet'] }),
+      ]),
+    ],
+    dashboard: [
+      { id: 'w1', kind: 'stats', title: 'Products', metric: 'count:products' },
+      { id: 'w2', kind: 'alert', title: 'Low Stock', metric: 'countWhere:products.stock.lt.10' },
+      { id: 'w3', kind: 'stats', title: 'Sales', metric: 'sum:sales.total' },
+      { id: 'w4', kind: 'list', title: 'Recent Sales', metric: 'recent:sales.5' },
     ],
   },
 
@@ -123,7 +177,14 @@ export const APP_SECTORS: Record<string, SectorPreset> = {
         f('price', 'Price', 'number', { required: true }),
         f('stock', 'Stock', 'number', { required: true }),
       ], true),
-      ent('customers', 'Customer', 'users', [f('name', 'Name', 'text', { required: true }), f('email', 'Email', 'email')]),
+      ent('customers', 'Customer', 'users', [
+        f('name', 'Name', 'text', { required: true }),
+        f('email', 'Email', 'email'),
+        f('phone', 'Phone', 'text'),
+        f('size', 'Preferred Size', 'text'),
+        f('customerType', 'Customer Type', 'select', { options: ['Regular', 'VIP', 'Wholesale'] }),
+        f('notes', 'Notes', 'textarea'),
+      ]),
     ],
     dashboard: [
       { id: 'w1', kind: 'stats', title: 'Products', metric: 'count:products' },
@@ -145,9 +206,10 @@ export const APP_SECTORS: Record<string, SectorPreset> = {
       ent('menu', 'Menu Item', 'utensils', [
         f('name', 'Name', 'text', { required: true }),
         f('price', 'Price', 'number', { required: true }),
-        f('category', 'Category', 'select', { options: ['Starter', 'Main', 'Dessert', 'Drink'] }),
+        f('category', 'Category', 'select', { entityRef: 'categories' }),
         f('description', 'Description', 'textarea'),
       ], true),
+      categoriesEntity(),
       ent('orders', 'Order', 'receipt', [
         f('table', 'Table', 'text'),
         f('items', 'Items', 'textarea', { required: true }),
@@ -160,7 +222,13 @@ export const APP_SECTORS: Record<string, SectorPreset> = {
         ])),
         f('date', 'Date', 'date'),
       ]),
-      ent('customers', 'Customer', 'users', [f('name', 'Name', 'text'), f('phone', 'Phone', 'text')]),
+      ent('customers', 'Customer', 'users', [
+        f('name', 'Name', 'text', { required: true }),
+        f('phone', 'Phone', 'text'),
+        f('email', 'Email', 'email'),
+        f('customerType', 'Customer Type', 'select', { options: ['Regular', 'VIP', 'Wholesale'] }),
+        f('notes', 'Notes', 'textarea'),
+      ]),
     ],
     dashboard: [
       { id: 'w1', kind: 'stats', title: 'Open Orders', metric: 'countWhere:orders.status.eq.Open' },
@@ -221,7 +289,15 @@ export const APP_SECTORS: Record<string, SectorPreset> = {
     views: ['kanban'],
     kanbanEntityId: 'repairTickets',
     entities: [
-      ent('customers', 'Customer', 'users', [f('name', 'Name', 'text', { required: true }), f('phone', 'Phone', 'text')]),
+      ent('customers', 'Customer', 'users', [
+        f('name', 'Name', 'text', { required: true }),
+        f('email', 'Email', 'email'),
+        f('phone', 'Phone', 'text'),
+        f('bornOn', 'Date of Birth', 'date'),
+        f('customerType', 'Customer Type', 'select', { options: ['Regular', 'VIP', 'Wholesale'] }),
+        f('visits', 'Visits', 'number'),
+        f('notes', 'Notes', 'textarea'),
+      ]),
       ent('devices', 'Device', 'cpu', [f('customer', 'Customer', 'text'), f('type', 'Type', 'select', { options: ['Phone', 'Laptop', 'Tablet'] }), f('brand', 'Brand', 'text')]),
       ent('repairTickets', 'Repair Ticket', 'wrench', [
         f('device', 'Device', 'text', { required: true }),
@@ -261,8 +337,9 @@ export const APP_SECTORS: Record<string, SectorPreset> = {
         f('name', 'Name', 'text', { required: true }),
         f('price', 'Price', 'number', { required: true }),
         f('duration', 'Duration (min)', 'number'),
-        f('category', 'Category', 'select', { options: ['Hair', 'Skin', 'Nails', 'Massage'] }),
+        f('category', 'Category', 'select', { entityRef: 'categories' }),
       ], true),
+      categoriesEntity(),
       ent('staff', 'Staff', 'users', [f('name', 'Name', 'text', { required: true }), f('schedule', 'Schedule', 'text')]),
       ent('appointments', 'Appointment', 'calendar', [
         f('customer', 'Customer', 'text', { required: true }),
@@ -271,12 +348,67 @@ export const APP_SECTORS: Record<string, SectorPreset> = {
         f('staff', 'Staff', 'text'),
         f('status', 'Status', 'select', { options: ['Booked', 'Completed', 'Cancelled'] }),
       ]),
-      ent('customers', 'Customer', 'users', [f('name', 'Name', 'text'), f('phone', 'Phone', 'text')]),
+      ent('customers', 'Customer', 'users', [
+        f('name', 'Name', 'text', { required: true }),
+        f('phone', 'Phone', 'text'),
+        f('email', 'Email', 'email'),
+        f('bornOn', 'Date of Birth', 'date'),
+        f('customerType', 'Customer Type', 'select', { options: ['Regular', 'VIP', 'Wholesale'] }),
+        f('visits', 'Visits', 'number'),
+        f('notes', 'Notes', 'textarea'),
+      ]),
     ],
     dashboard: [
       { id: 'w1', kind: 'stats', title: 'Appointments', metric: 'count:appointments' },
       { id: 'w2', kind: 'chart', title: 'By Service', metric: 'seriesBy:appointments.service' },
       { id: 'w3', kind: 'list', title: 'Recent Appointments', metric: 'recent:appointments.5' },
+    ],
+  },
+
+  barbershop: {
+    id: 'barbershop',
+    label: 'Barbershop & Grooming',
+    icon: 'scissors',
+    description: 'Haircuts, shaves, barber rota, appointments.',
+    features: { auth: true, reports: true, pos: true, rbac: true },
+    views: ['pos', 'calendar'],
+    posEntityId: 'services',
+    calendarEntityId: 'appointments',
+    entities: [
+      ent('services', 'Service', 'sparkles', [
+        f('name', 'Name', 'text', { required: true }),
+        f('price', 'Price', 'number', { required: true }),
+        f('duration', 'Duration (min)', 'number'),
+        f('category', 'Category', 'select', { entityRef: 'categories' }),
+      ], true),
+      categoriesEntity(),
+      ent('barbers', 'Barber', 'users', [
+        f('name', 'Name', 'text', { required: true }),
+        f('phone', 'Phone', 'text'),
+        f('specialty', 'Specialty', 'select', { options: ['Haircut', 'Beard', 'Color', 'All'] }),
+        f('available', 'Available', 'checkbox'),
+      ]),
+      ent('appointments', 'Appointment', 'calendar', [
+        f('barber', 'Barber', 'text', { required: true }),
+        f('service', 'Service', 'text'),
+        f('datetime', 'When', 'datetime-local', { required: true }),
+        f('status', 'Status', 'select', { options: ['Booked', 'In Progress', 'Completed', 'Cancelled'] }),
+      ]),
+      ent('customers', 'Customer', 'users', [
+        f('name', 'Name', 'text', { required: true }),
+        f('phone', 'Phone', 'text'),
+        f('email', 'Email', 'email'),
+        f('bornOn', 'Date of Birth', 'date'),
+        f('preferredBarber', 'Preferred Barber', 'text'),
+        f('visits', 'Visits', 'number'),
+        f('notes', 'Notes', 'textarea'),
+      ]),
+    ],
+    dashboard: [
+      { id: 'w1', kind: 'stats', title: 'Appointments', metric: 'count:appointments' },
+      { id: 'w2', kind: 'stats', title: 'Barbers', metric: 'count:barbers' },
+      { id: 'w3', kind: 'chart', title: 'Appointments (7d)', metric: 'series7:appointments.datetime' },
+      { id: 'w4', kind: 'list', title: 'Recent Appointments', metric: 'recent:appointments.5' },
     ],
   },
 
@@ -334,8 +466,11 @@ export const APP_SECTORS: Record<string, SectorPreset> = {
       ent('members', 'Member', 'users', [
         f('name', 'Name', 'text', { required: true }),
         f('email', 'Email', 'email'),
-        f('plan', 'Plan', 'select', { options: ['Monthly', 'Quarterly', 'Yearly'] }),
+        f('phone', 'Phone', 'text'),
+        f('plan', 'Plan', 'select', { entityRef: 'plans' }),
         f('renewal', 'Renewal', 'date'),
+        f('memberType', 'Member Type', 'select', { options: ['Regular', 'Premium', 'Annual'] }),
+        f('notes', 'Notes', 'textarea'),
       ]),
       ent('checkins', 'Check-in', 'clock', [f('member', 'Member', 'text', { required: true }), f('date', 'Date', 'date'), f('time', 'Time', 'time')]),
     ],
@@ -357,7 +492,15 @@ export const APP_SECTORS: Record<string, SectorPreset> = {
     calendarEntityId: 'appointments',
     entities: [
       ent('doctors', 'Doctor', 'stethoscope', [f('name', 'Name', 'text', { required: true }), f('specialty', 'Specialty', 'text')]),
-      ent('patients', 'Patient', 'users', [f('name', 'Name', 'text', { required: true }), f('email', 'Email', 'email'), f('phone', 'Phone', 'text')]),
+      ent('patients', 'Patient', 'users', [
+        f('name', 'Name', 'text', { required: true }),
+        f('email', 'Email', 'email'),
+        f('phone', 'Phone', 'text'),
+        f('bornOn', 'Date of Birth', 'date'),
+        f('bloodType', 'Blood Type', 'select', { options: ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'] }),
+        f('allergies', 'Allergies', 'textarea'),
+        f('medicalHistory', 'Medical History', 'textarea'),
+      ]),
       ent('appointments', 'Appointment', 'calendar', [
         f('patient', 'Patient', 'text', { required: true }),
         f('doctor', 'Doctor', 'text'),

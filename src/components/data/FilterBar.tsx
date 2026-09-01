@@ -27,7 +27,7 @@ export default function FilterBar({
           setField(next)
           onChange(next ? { field: next, value: '' } : null)
         }}
-        className="rounded-lg border border-slate-300 px-2 py-2 text-sm"
+        className="rounded-lg border border-slate-300 px-2 py-2 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
       >
         <option value="">All fields</option>
         {selectFields.map((f) => (
@@ -40,7 +40,7 @@ export default function FilterBar({
         <select
           value={value?.value || ''}
           onChange={(e) => onChange({ field, value: e.target.value })}
-          className="rounded-lg border border-slate-300 px-2 py-2 text-sm"
+          className="rounded-lg border border-slate-300 px-2 py-2 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
         >
           <option value="">Any</option>
           {active.options?.map((o) => (

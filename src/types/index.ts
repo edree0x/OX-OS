@@ -14,12 +14,18 @@ export type FieldType =
   | 'file-upload'
   | 'image-preview'
 
+/** Extra capabilities that can be granted per user (beyond the role baseline). */
+export type PermissionKey = 'manageFields'
+
 export interface FieldSchema {
   key: string
   label: string
   type: FieldType
   required?: boolean
+  /** Static options for select/status-badge fields */
   options?: string[]
+  /** When set, options are loaded live from another entity (e.g. categories) */
+  entityRef?: string
   placeholder?: string
   /** For status-badge: maps value -> tone */
   statuses?: { value: string; label: string; tone: 'slate' | 'green' | 'red' | 'indigo' | 'amber' }[]
@@ -112,6 +118,8 @@ export interface User {
   username: string
   name: string
   role: Role
+  /** per-user capability grants (additive, defaults applied per role) */
+  permissions?: PermissionKey[]
 }
 
 export interface CartLine {

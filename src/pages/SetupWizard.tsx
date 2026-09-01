@@ -23,7 +23,7 @@ export default function SetupWizard() {
   const next = () => setStep((s) => s + 1)
   const back = () => setStep((s) => Math.max(0, s - 1))
 
-  const finish = () => {
+  const finish = async () => {
     const entityIds = preset.entities.map((e) => e.id)
     const config = buildConfig({
       appName: appName || preset.label,
@@ -34,8 +34,12 @@ export default function SetupWizard() {
     })
     saveConfig(config)
     if (currency !== 'USD') updateConfig({ currency })
-    login('admin', 'admin')
-    notify('Setup complete — welcome!', 'success')
+    try {
+      await login('admin', 'admin')
+      notify('Setup complete — welcome!', 'success')
+    } catch {
+      notify('Could not sign in automatically — please log in manually', 'error')
+    }
     navigate('/')
   }
 
@@ -113,7 +117,7 @@ export default function SetupWizard() {
               <Icon name="chevron-down" className="h-4 w-4" />
             </Button>
           ) : (
-            <Button onClick={finish}>
+            <Button onClick={() => void finish()}>
               <Icon name="check" className="h-4 w-4" />
               Finish & start
             </Button>

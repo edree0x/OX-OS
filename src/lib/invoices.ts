@@ -1,5 +1,8 @@
 export interface ReceiptData {
   lines: { refId: string; name: string; price: number; qty: number; modifiers?: string[] }[]
+  subtotal: number
+  discount: number
+  tax: number
   total: number
   tenders: { method: string; amount: number }[]
   table?: string
@@ -19,7 +22,7 @@ export async function exportA4(data: ReceiptData, appName: string): Promise<void
   doc.text(appName, margin, y)
   y += 22
   doc.setFontSize(10)
-  doc.text(`Invoice  #${data.invoiceNo}`, margin, y)
+  doc.text(`Invoice  ${data.invoiceNo}`, margin, y)
   doc.text(new Date(data.date).toLocaleString(), 410, y)
   y += 16
   if (data.table) {
@@ -44,6 +47,17 @@ export async function exportA4(data: ReceiptData, appName: string): Promise<void
   y += 6
   doc.line(margin, y, 555, y)
   y += 20
+  doc.setFontSize(10)
+  doc.text(`Subtotal: ${(data.subtotal).toFixed(2)}`, 360, y)
+  y += 14
+  if (data.discount > 0) {
+    doc.text(`Discount: -${(data.discount).toFixed(2)}`, 360, y)
+    y += 14
+  }
+  if (data.tax > 0) {
+    doc.text(`Tax: ${(data.tax).toFixed(2)}`, 360, y)
+    y += 14
+  }
   doc.setFontSize(12)
   doc.text(`Total: ${(data.total).toFixed(2)}`, 360, y)
   y += 20
@@ -55,5 +69,5 @@ export async function exportA4(data: ReceiptData, appName: string): Promise<void
   if (change > 0) {
     doc.text(`Change: ${change.toFixed(2)}`, 360, y)
   }
-  doc.save(`invoice-${data.invoiceNo}.pdf`)
+  doc.save(`${data.invoiceNo}.pdf`)
 }

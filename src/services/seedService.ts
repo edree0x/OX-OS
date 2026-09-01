@@ -2,6 +2,32 @@ import type { AppConfig, EntitySchema, FieldSchema } from '../types'
 import { listAll, createEntity } from './entityService'
 import * as db from '../lib/db'
 
+/** Default categories per sector id, used to seed the categories entity. */
+const SECTOR_CATEGORIES: Record<string, string[]> = {
+  supermarket: ['Grocery', 'Produce', 'Electronics', 'Beverages', 'Frozen', 'Dairy'],
+  pharmacy: ['OTC', 'Prescription', 'Wellness', 'Baby Care'],
+  restaurant: ['Starter', 'Main', 'Dessert', 'Drink', 'Combo'],
+  salon: ['Hair', 'Skin', 'Nails', 'Massage', 'Grooming'],
+  barbershop: ['Haircut', 'Shave', 'Coloring', 'Treatment'],
+  grocery: ['Produce', 'Fresh', 'Packaged', 'Household', 'Bakery'],
+  apparel: ['Tops', 'Bottoms', 'Footwear', 'Accessories'],
+}
+
+async function seedCategories(entity: EntitySchema, sectorId: string) {
+  const existing = await listAll(entity.id)
+  if (existing.length > 0) return
+  const names = SECTOR_CATEGORIES[sectorId] || ['General']
+  const palette = ['#6366f1', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6', '#f43f5e']
+  for (let i = 0; i < names.length; i++) {
+    await createEntity(entity.id, {
+      name: names[i],
+      description: `${names[i]} category`,
+      color: palette[i % palette.length],
+      active: true,
+    })
+  }
+}
+
 function sampleValue(f: FieldSchema, i: number): unknown {
   switch (f.type) {
     case 'number':
@@ -39,9 +65,22 @@ function sampleValue(f: FieldSchema, i: number): unknown {
 async function seedEntity(entity: EntitySchema) {
   const existing = await listAll(entity.id)
   if (existing.length > 0) return
+  // Resolve referenced-entity options once (e.g. product -> category)
+  const refCache = new Map<string, string[]>()
+  for (const f of entity.fields) {
+    if (f.type === 'select' && f.entityRef) {
+      const rows = await listAll(f.entityRef)
+      refCache.set(f.entityRef, rows.filter((r) => r.active !== false).map((r) => String(r.name ?? '')))
+    }
+  }
   for (let i = 1; i <= 8; i++) {
     const data: Record<string, unknown> = {}
     entity.fields.forEach((f) => {
+      if (f.type === 'select' && f.entityRef) {
+        const names = refCache.get(f.entityRef) || []
+        data[f.key] = names.length ? names[i % names.length] : 'General'
+        return
+      }
       data[f.key] = sampleValue(f, i)
     })
     // ensure a price-like field for POS catalog
@@ -68,6 +107,10 @@ async function seedTables(count: number, label: string) {
 
 export async function seedForConfig(config: AppConfig) {
   for (const e of config.entities) {
+    if (e.id === 'categories') {
+      await seedCategories(e, config.sector)
+      continue
+    }
     await seedEntity(e)
   }
   if (config.tableMap) {

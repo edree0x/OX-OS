@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { SECTOR_LIST, buildConfig, customEntity, APP_SECTORS } from '../config/presets'
 
 describe('presets', () => {
-  it('has 11 sectors plus custom', () => {
-    expect(SECTOR_LIST.length).toBe(12)
+  it('has 13 sectors plus custom', () => {
+    expect(SECTOR_LIST.length).toBe(14)
     expect(SECTOR_LIST.some((s) => s.id === 'custom')).toBe(true)
   })
 

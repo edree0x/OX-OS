@@ -8,6 +8,7 @@ interface ConfigState {
   setConfig: (config: AppConfig) => void
   updateConfig: (patch: Partial<AppConfig>) => void
   addEntity: (entity: EntitySchema) => void
+  updateEntity: (entity: EntitySchema) => void
   removeEntity: (id: string) => void
   resetConfig: () => void
 }
@@ -24,12 +25,31 @@ export const useConfigStore = create<ConfigState>()(
             ? { config: { ...s.config, entities: [...s.config.entities, entity] } }
             : {},
         ),
-      removeEntity: (id) =>
+      updateEntity: (entity) =>
         set((s) =>
           s.config
-            ? { config: { ...s.config, entities: s.config.entities.filter((e) => e.id !== id) } }
+            ? {
+                config: {
+                  ...s.config,
+                  entities: s.config.entities.map((e) => (e.id === entity.id ? entity : e)),
+                },
+              }
             : {},
         ),
+      removeEntity: (id) =>
+        set((s) => {
+          if (!s.config) return {}
+          const cfg = s.config
+          return {
+            config: {
+              ...cfg,
+              entities: cfg.entities.filter((e) => e.id !== id),
+              posEntityId: cfg.posEntityId === id ? undefined : cfg.posEntityId,
+              calendarEntityId: cfg.calendarEntityId === id ? undefined : cfg.calendarEntityId,
+              kanbanEntityId: cfg.kanbanEntityId === id ? undefined : cfg.kanbanEntityId,
+            },
+          }
+        }),
       resetConfig: () => {
         Object.keys(localStorage)
           .filter((k) => k.startsWith('seeded:') || k === 'multi-sector-erp-auth')

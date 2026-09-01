@@ -42,6 +42,11 @@ import {
   RefreshCw,
   Database,
   Gauge,
+  Pause,
+  Play,
+  Sun,
+  Moon,
+  ChevronUp,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -89,6 +94,12 @@ const MAP: Record<string, LucideIcon> = {
   refresh: RefreshCw,
   database: Database,
   gauge: Gauge,
+  pause: Pause,
+  play: Play,
+  sun: Sun,
+  moon: Moon,
+  up: ChevronUp,
+  down: ChevronDown,
 }
 
 export function Icon({ name, className = 'h-5 w-5' }: { name: string; className?: string }) {
