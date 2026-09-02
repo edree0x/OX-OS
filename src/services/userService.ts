@@ -1,4 +1,4 @@
-import * as db from '../lib/db'
+import { indexDbDataSource as db } from '../lib/db'
 import { uid } from '../lib/utils'
 import type { Role, PermissionKey } from '../types'
 
@@ -63,12 +63,12 @@ function toRecord(u: StoredUser): Record<string, unknown> {
 }
 
 export async function listUsers(): Promise<StoredUser[]> {
-  const rows = await db.dbGetAll(USERS_COLLECTION)
+  const rows = await db.getAll(USERS_COLLECTION)
   return (rows as unknown as StoredUser[]).sort((a, b) => String(a.username).localeCompare(String(b.username)))
 }
 
 export async function getUser(id: string): Promise<StoredUser | null> {
-  const r = await db.dbGet(USERS_COLLECTION, id)
+  const r = await db.get(USERS_COLLECTION, id)
   return (r as unknown as StoredUser | null) ?? null
 }
 
@@ -96,7 +96,7 @@ export async function createUser(input: UserInput): Promise<StoredUser> {
     permissions: effectivePermissions(input.role, input.permissions ?? []),
     createdAt: Date.now(),
   }
-  await db.dbPut(USERS_COLLECTION, toRecord(user))
+  await db.put(USERS_COLLECTION, toRecord(user))
   return user
 }
 
@@ -113,7 +113,7 @@ export async function updateUser(id: string, patch: Partial<UserInput>): Promise
   }
   if (patch.password) next.passwordHash = await hashPassword(patch.password)
   next.updatedAt = Date.now()
-  await db.dbPut(USERS_COLLECTION, toRecord(next))
+  await db.put(USERS_COLLECTION, toRecord(next))
   return next
 }
 
@@ -123,7 +123,7 @@ export async function deleteUser(id: string): Promise<void> {
     const admins = (await listUsers()).filter((u) => u.role === 'admin' && u.id !== id)
     if (admins.length === 0) throw new Error('Cannot delete the last admin')
   }
-  await db.dbDelete(USERS_COLLECTION, id)
+  await db.delete(USERS_COLLECTION, id)
 }
 
 export async function verifyCredentials(username: string, password: string): Promise<Omit<StoredUser, 'passwordHash'> | null> {

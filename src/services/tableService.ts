@@ -1,4 +1,4 @@
-import * as db from '../lib/db'
+import { indexDbDataSource as db } from '../lib/db'
 
 export interface TableState {
   id: string
@@ -9,14 +9,14 @@ export interface TableState {
 }
 
 export async function listTables(): Promise<TableState[]> {
-  const rows = (await db.dbGetAll('pos_tables')) as unknown as TableState[]
+  const rows = (await db.getAll('pos_tables')) as unknown as TableState[]
   return rows.sort((a, b) => a.number - b.number)
 }
 
 export async function updateTable(id: string, patch: Partial<TableState>): Promise<TableState> {
-  const existing = (await db.dbGet('pos_tables', id)) as unknown as TableState | null
+  const existing = (await db.get('pos_tables', id)) as unknown as TableState | null
   const next: TableState = { ...(existing ?? ({} as TableState)), ...patch, id }
-  await db.dbPut('pos_tables', next as unknown as Record<string, unknown>)
+  await db.put('pos_tables', next as unknown as Record<string, unknown>)
   return next
 }
 

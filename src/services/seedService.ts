@@ -1,6 +1,6 @@
 import type { AppConfig, EntitySchema, FieldSchema } from '../types'
 import { listAll, createEntity } from './entityService'
-import * as db from '../lib/db'
+import { indexDbDataSource as db } from '../lib/db'
 
 /** Default categories per sector id, used to seed the categories entity. */
 const SECTOR_CATEGORIES: Record<string, string[]> = {
@@ -92,10 +92,10 @@ async function seedEntity(entity: EntitySchema) {
 }
 
 async function seedTables(count: number, label: string) {
-  const existing = await db.dbGetAll('pos_tables')
+  const existing = await db.getAll('pos_tables')
   if (existing.length > 0) return
   for (let i = 1; i <= count; i++) {
-    await db.dbPut('pos_tables', {
+    await db.put('pos_tables', {
       id: `table-${i}`,
       number: i,
       label: `${label} ${i}`,

@@ -9,6 +9,7 @@ import FieldEditor from '../components/forms/FieldEditor'
 import { customEntity } from '../config/presets'
 import { slug } from '../lib/utils'
 import type { EntitySchema } from '../types'
+import BackupPanel from '../components/backup/BackupPanel'
 
 const SECTOR_OPTIONS = ['USD', 'EGP', 'SAR', 'AED', 'EUR', 'GBP']
 
@@ -117,6 +118,8 @@ export default function SettingsPage() {
           </Button>
         </div>
       </Card>
+
+      <BackupPanel />
 
       <Card className="p-5">
         <div className="mb-3 flex items-center justify-between">

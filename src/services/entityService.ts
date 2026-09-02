@@ -1,4 +1,4 @@
-import * as db from '../lib/db'
+import { indexDbDataSource as db } from '../lib/db'
 import { uid } from '../lib/utils'
 
 export interface ListParams {
@@ -12,7 +12,7 @@ export interface ListParams {
 
 export async function listEntities(entityId: string, params: ListParams = {}) {
   const { search = '', sortBy, sortDir = 'asc', page = 1, pageSize = 10, filter } = params
-  let rows = await db.dbGetAll(entityId)
+  let rows = await db.getAll(entityId)
 
   if (filter && filter.field) {
     rows = rows.filter((r) => String(r[filter.field] ?? '') === String(filter.value))
@@ -43,25 +43,25 @@ export async function listEntities(entityId: string, params: ListParams = {}) {
 }
 
 export async function getEntity(entityId: string, id: string) {
-  return db.dbGet(entityId, id)
+  return db.get(entityId, id)
 }
 
 export async function createEntity(entityId: string, data: Record<string, unknown>) {
   const record = { ...data, id: uid(), createdAt: Date.now() }
-  await db.dbPut(entityId, record)
+  await db.put(entityId, record)
   return record
 }
 
 export async function updateEntity(entityId: string, id: string, data: Record<string, unknown>) {
   const record = { ...data, id, updatedAt: Date.now() }
-  await db.dbPut(entityId, record)
+  await db.put(entityId, record)
   return record
 }
 
 export async function deleteEntity(entityId: string, id: string) {
-  await db.dbDelete(entityId, id)
+  await db.delete(entityId, id)
 }
 
 export async function listAll(entityId: string): Promise<Record<string, unknown>[]> {
-  return db.dbGetAll(entityId)
+  return db.getAll(entityId)
 }

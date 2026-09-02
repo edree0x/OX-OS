@@ -4,9 +4,13 @@ import Sidebar from './Sidebar'
 import Header from './Header'
 import ErrorBoundary from '../ErrorBoundary'
 import { Toaster } from '../ui/Toast'
+import { useAutoBackup } from '../../hooks/useAutoBackup'
+import { useAppConfig } from '../../hooks/useAppConfig'
 
 export default function Layout() {
   const fetching = useIsFetching()
+  const config = useAppConfig()
+  useAutoBackup(!!config)
   return (
     <div className="flex h-full bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
       {fetching > 0 && (

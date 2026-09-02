@@ -1,4 +1,4 @@
-import * as db from '../lib/db'
+import { indexDbDataSource as db } from '../lib/db'
 import { slug } from '../lib/utils'
 import type { AppConfig, EntitySchema, FieldSchema, FieldType } from '../types'
 
@@ -59,7 +59,7 @@ export function isDuplicateKey(fields: FieldSchema[], key: string, ignore?: stri
 
 /** Reads every record of an entity and rewrites the given key while saving. */
 export async function migrateFieldData(entityId: string, oldKey: string, newKey: string): Promise<number> {
-  const rows = await db.dbGetAll(entityId)
+  const rows = await db.getAll(entityId)
   let moved = 0
   await Promise.all(
     rows.map(async (r) => {
@@ -70,7 +70,7 @@ export async function migrateFieldData(entityId: string, oldKey: string, newKey:
         delete next[oldKey]
         moved += 1
       }
-      await db.dbPut(entityId, next)
+      await db.put(entityId, next)
     }),
   )
   return moved
@@ -78,7 +78,7 @@ export async function migrateFieldData(entityId: string, oldKey: string, newKey:
 
 /** Removes a field's value from every record of the entity. Returns count of touched rows. */
 export async function purgeFieldData(entityId: string, key: string): Promise<number> {
-  const rows = await db.dbGetAll(entityId)
+  const rows = await db.getAll(entityId)
   let cleaned = 0
   await Promise.all(
     rows.map(async (r) => {
@@ -86,7 +86,7 @@ export async function purgeFieldData(entityId: string, key: string): Promise<num
       const next = { ...r }
       delete next[key]
       cleaned += 1
-      await db.dbPut(entityId, next)
+      await db.put(entityId, next)
     }),
   )
   return cleaned

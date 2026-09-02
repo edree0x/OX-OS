@@ -47,6 +47,10 @@ import {
   Sun,
   Moon,
   ChevronUp,
+  Download,
+  Upload,
+  Save,
+  RotateCw,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -100,6 +104,10 @@ const MAP: Record<string, LucideIcon> = {
   moon: Moon,
   up: ChevronUp,
   down: ChevronDown,
+  download: Download,
+  upload: Upload,
+  save: Save,
+  rotate: RotateCw,
 }
 
 export function Icon({ name, className = 'h-5 w-5' }: { name: string; className?: string }) {

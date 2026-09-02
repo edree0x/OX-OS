@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { AppConfig, EntitySchema } from '../types'
-import { wipeDatabase } from '../lib/db'
+import { indexDbDataSource as db } from '../lib/db'
 
 interface ConfigState {
   config: AppConfig | null
@@ -54,7 +54,7 @@ export const useConfigStore = create<ConfigState>()(
         Object.keys(localStorage)
           .filter((k) => k.startsWith('seeded:') || k === 'multi-sector-erp-auth')
           .forEach((k) => localStorage.removeItem(k))
-        void wipeDatabase()
+        void db.wipe()
         set({ config: null })
       },
     }),
