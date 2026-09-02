@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # OX OS — Multi-Sector ERP Platform
 
 > A browser-first, zero-backend ERP system that adapts to 14 business sectors through a guided setup wizard. All data lives in IndexedDB — no server, no database, no vendor lock-in.
