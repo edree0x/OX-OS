@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # OX OS — Multi-Sector ERP Platform
 
 > A browser-first, zero-backend ERP system that adapts to 14 business sectors through a guided setup wizard. All data lives in IndexedDB — no server, no database, no vendor lock-in.
@@ -240,3 +241,6 @@ Field types: `text`, `number`, `email`, `date`, `datetime-local`, `time`, `selec
 - [Zod](https://zod.dev/) — Schema validation
 - [jsPDF](https://parall.ax/products/jspdf) — PDF generation
 - [Lucide](https://lucide.dev/) — Icon library
+=======
+# OX-OS
+>>>>>>> a09633f7cafd539f65502c0a3ef204056e71de90
