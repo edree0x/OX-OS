@@ -23,7 +23,7 @@ export default function Header() {
   return (
     <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6 dark:border-slate-700 dark:bg-slate-800">
       <div>
-        <h1 className="text-base font-semibold text-slate-800 dark:text-slate-100">{config?.appName}</h1>
+        <h1 className="text-base font-semibold text-slate-800 dark:text-slate-100">{config?.company?.name || config?.appName}</h1>
         <p className="text-xs text-slate-400 dark:text-slate-400">{config?.sector ? config.sector.replace(/^\w/, (c) => c.toUpperCase()) : 'ERP'}</p>
       </div>
 
@@ -38,7 +38,7 @@ export default function Header() {
 
         {user && (
           <div className="flex items-center gap-2 rounded-lg border border-slate-200 py-1.5 pl-1.5 pr-2 dark:border-slate-600">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--brand-primary)] text-sm font-semibold text-white">
               {user.name?.[0] || 'U'}
             </div>
             <div className="hidden text-sm sm:block">

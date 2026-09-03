@@ -5,11 +5,15 @@ import { useConfigStore } from '../stores/configStore'
 import { Card, Button, Modal, Badge, EmptyState } from '../components/ui/primitives'
 import { Icon } from '../components/ui/Icon'
 import { notify } from '../components/ui/Toast'
+import { usePermissions } from '../hooks/usePermissions'
 import FieldEditor from '../components/forms/FieldEditor'
 import { customEntity } from '../config/presets'
 import { slug } from '../lib/utils'
 import type { EntitySchema } from '../types'
 import BackupPanel from '../components/backup/BackupPanel'
+import CompanyPanel from '../components/branding/CompanyPanel'
+import ActivityLogPanel from '../components/audit/ActivityLogPanel'
+import FeatureFlagsPanel from '../components/setup/FeatureFlagsPanel'
 
 const SECTOR_OPTIONS = ['USD', 'EGP', 'SAR', 'AED', 'EUR', 'GBP']
 
@@ -21,6 +25,7 @@ export default function SettingsPage() {
   const removeEntity = useConfigStore((s) => s.removeEntity)
   const updateEntity = useConfigStore((s) => s.updateEntity)
   const navigate = useNavigate()
+  const isAdmin = usePermissions().can('admin')
   const [appName, setAppName] = useState(config?.appName || '')
   const [currency, setCurrency] = useState(config?.currency || 'USD')
   const [tableMap, setTableMap] = useState(!!config?.tableMap)
@@ -120,6 +125,15 @@ export default function SettingsPage() {
       </Card>
 
       <BackupPanel />
+
+      <CompanyPanel />
+
+      {isAdmin && (
+        <>
+          <FeatureFlagsPanel />
+          <ActivityLogPanel />
+        </>
+      )}
 
       <Card className="p-5">
         <div className="mb-3 flex items-center justify-between">

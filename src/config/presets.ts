@@ -601,3 +601,64 @@ export function customEntity(name: string): EntitySchema {
     ],
   }
 }
+
+/** Entities injected on top of a sector preset based on the user's feature flags. */
+export function featureEntities(flags: Partial<AppConfig['featureFlags']> = {}): EntitySchema[] {
+  const out: EntitySchema[] = []
+
+  const branches = flags.branches
+  if (branches && branches !== 'none') {
+    out.push(
+      ent('branches', 'Branch', 'warehouse', [
+        f('name', 'Name', 'text', { required: true }),
+        f('address', 'Address', 'text'),
+        f('phone', 'Phone', 'text'),
+        f('manager', 'Manager', 'text'),
+        f('active', 'Active', 'checkbox'),
+      ]),
+    )
+  }
+
+  const purchasing = flags.purchasing
+  if (purchasing && purchasing !== 'none') {
+    out.push(
+      ent('purchaseOrders', 'Purchase Order', 'truck', [
+        f('supplier', 'Supplier', 'text', { required: true }),
+        f('total', 'Total', 'number', { required: true }),
+        f('date', 'Date', 'date', { required: true }),
+        f('status', 'Status', 'status-badge', statusBadge(['Draft', 'Pending', 'Approved', 'Received', 'Rejected'], [
+          { value: 'Draft', label: 'Draft', tone: 'slate' },
+          { value: 'Pending', label: 'Pending', tone: 'amber' },
+          { value: 'Approved', label: 'Approved', tone: 'green' },
+          { value: 'Received', label: 'Received', tone: 'green' },
+          { value: 'Rejected', label: 'Rejected', tone: 'red' },
+        ])),
+      ]),
+    )
+  }
+
+  const inventory = flags.inventory
+  if (inventory === 'advanced') {
+    out.push(
+      ent('warehouses', 'Warehouse', 'box', [
+        f('name', 'Name', 'text', { required: true }),
+        f('location', 'Location', 'text'),
+      ]),
+      ent('stockMovements', 'Stock Movement', 'box', [
+        f('product', 'Product', 'text', { required: true }),
+        f('type', 'Type', 'select', { options: ['In', 'Out', 'Adjust'] }),
+        f('qty', 'Quantity', 'number', { required: true }),
+        f('date', 'Date', 'date', { required: true }),
+        f('note', 'Note', 'text'),
+      ]),
+    )
+  }
+
+  return out
+}
+
+/** Merge feature entities into an existing entity list (dedup by id, keep catalog flag). */
+export function mergeFeatureEntities(entities: EntitySchema[], flags: Partial<AppConfig['featureFlags']> = {}): EntitySchema[] {
+  const extras = featureEntities(flags).filter((e) => !entities.some((x) => x.id === e.id))
+  return [...entities, ...extras]
+}

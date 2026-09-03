@@ -18,6 +18,13 @@
 
 :root {
   color-scheme: light;
+  /* Brand tokens — overridden at runtime by applyBranding() */
+  --brand-primary: #6366f1;
+  --brand-primary-hover: #4f46e5;
+  --brand-primary-soft: #6366f11a;
+  --brand-primary-soft-strong: #6366f12b;
+  --brand-accent: #0ea5e9;
+  --brand-accent-hover: #0284c7;
 }
 
 html.dark {

@@ -14,8 +14,8 @@ export default function Layout() {
   return (
     <div className="flex h-full bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
       {fetching > 0 && (
-        <div className="fixed left-0 right-0 top-0 z-[110] h-1 overflow-hidden bg-indigo-100">
-          <div className="h-full w-1/3 animate-[loading_1s_ease-in-out_infinite] bg-indigo-600" />
+        <div className="fixed left-0 right-0 top-0 z-[110] h-1 overflow-hidden bg-[var(--brand-primary-soft)]">
+          <div className="h-full w-1/3 animate-[loading_1s_ease-in-out_infinite] bg-[var(--brand-primary)]" />
         </div>
       )}
       <Sidebar />

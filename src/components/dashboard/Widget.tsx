@@ -9,7 +9,7 @@ export function BarChart({ data, height = 128 }: { data: { label: string; value:
       {data.map((d, i) => (
         <div key={i} className="flex flex-1 flex-col items-center gap-1">
           <div
-            className="w-full rounded bg-indigo-500"
+            className="w-full rounded bg-[var(--brand-primary)]"
             style={{ height: `${(d.value / max) * 100}%`, minHeight: d.value > 0 ? '4px' : '0' }}
             title={`${d.label}: ${d.value}`}
           />

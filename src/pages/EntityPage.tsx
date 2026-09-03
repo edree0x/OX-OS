@@ -8,6 +8,7 @@ import SearchBar from '../components/data/SearchBar'
 import FilterBar from '../components/data/FilterBar'
 import Pagination from '../components/data/Pagination'
 import DataTable from '../components/data/DataTable'
+import WorkflowActions from '../components/data/WorkflowActions'
 import DynamicForm from '../components/forms/DynamicForm'
 import FieldEditor from '../components/forms/FieldEditor'
 import { Button, Modal, Card, Spinner, EmptyState } from '../components/ui/primitives'
@@ -31,6 +32,7 @@ export default function EntityPage() {
   const [schemaOpen, setSchemaOpen] = useState(false)
 
   const pageSize = 10
+  const workflowEnabled = config?.featureFlags?.workflow === 'basic' || config?.featureFlags?.workflow === 'advanced'
   const { data, isLoading } = useEntityList(entityId, {
     search: q || undefined,
     filter: filter || undefined,
@@ -43,6 +45,7 @@ export default function EntityPage() {
 
   if (!entity) return <p className="text-sm text-slate-400">Unknown entity.</p>
 
+  const hasStatus = entity.fields.some((f) => f.key === 'status')
   const onSort = (key: string) => {
     if (sortBy === key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
     else {
@@ -134,6 +137,7 @@ export default function EntityPage() {
                   }
                 }
               }}
+              workflow={workflowEnabled && hasStatus ? (r) => <WorkflowActions entityId={entityId} record={r} /> : undefined}
             />
           )}
         </Card>

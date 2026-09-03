@@ -23,7 +23,7 @@ export default function Pagination({
             onClick={() => onChange(i + 1)}
             className={`h-8 w-8 rounded transition-colors ${
               page === i + 1
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-[var(--brand-primary)] text-white'
                 : 'hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'
             }`}
           >

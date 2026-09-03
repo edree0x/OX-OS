@@ -35,6 +35,7 @@ export default function DataTable({
   sortBy,
   sortDir,
   onSort,
+  workflow,
 }: {
   entity: EntitySchema
   rows: Record<string, unknown>[]
@@ -43,6 +44,7 @@ export default function DataTable({
   sortBy: string | null
   sortDir: 'asc' | 'desc'
   onSort: (key: string) => void
+  workflow?: (r: Record<string, unknown>) => React.ReactNode
 }) {
   return (
     <div className="overflow-x-auto">
@@ -69,7 +71,8 @@ export default function DataTable({
                 </td>
               ))}
               <td className="px-3 py-2 text-right">
-                <div className="inline-flex gap-1">
+                <div className="inline-flex items-center justify-end gap-1">
+                  {workflow && workflow(r)}
                   <button onClick={() => onEdit(r)} className="rounded p-1.5 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700" aria-label="Edit">
                     <Icon name="edit" className="h-4 w-4" />
                   </button>

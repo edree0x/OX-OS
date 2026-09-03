@@ -10,21 +10,56 @@ export interface ReceiptData {
   invoiceNo: string
 }
 
-export async function exportA4(data: ReceiptData, appName: string): Promise<void> {
+export interface InvoiceCompany {
+  name?: string
+  legalName?: string
+  address?: string
+  phone?: string
+  email?: string
+  taxId?: string
+  receiptHeader?: string
+  receiptFooter?: string
+}
+
+export async function exportA4(data: ReceiptData, appName: string, company?: InvoiceCompany): Promise<void> {
   const { jsPDF } = await import('jspdf')
   const doc = new jsPDF({ unit: 'pt', format: 'a4' })
   const margin = 40
   let y = margin
   const paid = data.tenders.reduce((s, t) => s + t.amount, 0)
   const change = Math.max(0, paid - data.total)
+  const title = company?.name || company?.legalName || appName
 
   doc.setFontSize(18)
-  doc.text(appName, margin, y)
-  y += 22
+  doc.text(title, margin, y)
+  y += 14
+  if (company?.receiptHeader) {
+    doc.setFontSize(9)
+    doc.text(company.receiptHeader, margin, y)
+    y += 12
+  }
+  if (company?.address) {
+    doc.setFontSize(9)
+    doc.text(company.address, margin, y)
+    y += 12
+  }
+  const metaLine = [company?.phone, company?.email].filter(Boolean).join(' · ')
+  if (metaLine) {
+    doc.setFontSize(9)
+    doc.text(metaLine, margin, y)
+    y += 12
+  }
+  if (company?.taxId) {
+    doc.setFontSize(9)
+    doc.text(`Tax / VAT: ${company.taxId}`, margin, y)
+    y += 12
+  }
+  const headerBottom = y + 8
+
   doc.setFontSize(10)
-  doc.text(`Invoice  ${data.invoiceNo}`, margin, y)
-  doc.text(new Date(data.date).toLocaleString(), 410, y)
-  y += 16
+  doc.text(`Invoice  ${data.invoiceNo}`, margin, headerBottom)
+  doc.text(new Date(data.date).toLocaleString(), 410, headerBottom)
+  y = headerBottom + 16
   if (data.table) {
     doc.text(`Table: ${data.table}`, margin, y)
     y += 16
@@ -68,6 +103,11 @@ export async function exportA4(data: ReceiptData, appName: string): Promise<void
   })
   if (change > 0) {
     doc.text(`Change: ${change.toFixed(2)}`, 360, y)
+  }
+
+  if (company?.receiptFooter) {
+    doc.setFontSize(9)
+    doc.text(company.receiptFooter, margin, 800, { align: 'center', maxWidth: 515 })
   }
   doc.save(`${data.invoiceNo}.pdf`)
 }

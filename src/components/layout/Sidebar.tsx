@@ -3,6 +3,7 @@ import { useModules } from '../../hooks/useModules'
 import { usePermissions } from '../../hooks/usePermissions'
 import { useAppConfig } from '../../hooks/useAppConfig'
 import { Icon } from '../ui/Icon'
+import { BrandLogo, BrandWordmark } from '../branding/BrandLogo'
 import type { ModuleDef } from '../../types'
 
 function groupOf(m: ModuleDef): 'main' | 'management' | 'system' {
@@ -29,8 +30,8 @@ export default function Sidebar() {
   return (
     <aside className="flex w-64 flex-col border-r border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
       <div className="flex h-16 items-center gap-2 border-b border-slate-200 px-6 dark:border-slate-700">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">E</div>
-        <span className="truncate text-lg font-semibold text-slate-800 dark:text-slate-100">{config?.appName}</span>
+        <BrandLogo />
+        <BrandWordmark />
       </div>
 
       <nav className="flex-1 space-y-4 overflow-y-auto px-3 py-4">
@@ -46,7 +47,7 @@ export default function Sidebar() {
                   className={({ isActive }) =>
                     `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                       isActive
-                        ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300'
+                        ? 'bg-[var(--brand-primary-soft)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary-soft-strong)]'
                         : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700/60 dark:hover:text-slate-100'
                     }`
                   }

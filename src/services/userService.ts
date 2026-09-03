@@ -1,5 +1,6 @@
 import { indexDbDataSource as db } from '../lib/db'
 import { uid } from '../lib/utils'
+import { logAudit } from './auditService'
 import type { Role, PermissionKey } from '../types'
 
 export interface StoredUser {
@@ -97,6 +98,7 @@ export async function createUser(input: UserInput): Promise<StoredUser> {
     createdAt: Date.now(),
   }
   await db.put(USERS_COLLECTION, toRecord(user))
+  await logAudit({ action: 'create', collection: 'users', recordId: user.id, summary: `User ${user.username}` })
   return user
 }
 
@@ -114,6 +116,7 @@ export async function updateUser(id: string, patch: Partial<UserInput>): Promise
   if (patch.password) next.passwordHash = await hashPassword(patch.password)
   next.updatedAt = Date.now()
   await db.put(USERS_COLLECTION, toRecord(next))
+  await logAudit({ action: 'update', collection: 'users', recordId: next.id, summary: `User ${next.username}` })
   return next
 }
 
@@ -124,6 +127,7 @@ export async function deleteUser(id: string): Promise<void> {
     if (admins.length === 0) throw new Error('Cannot delete the last admin')
   }
   await db.delete(USERS_COLLECTION, id)
+  await logAudit({ action: 'delete', collection: 'users', recordId: id, summary: target ? `User ${target.username}` : undefined })
 }
 
 export async function verifyCredentials(username: string, password: string): Promise<Omit<StoredUser, 'passwordHash'> | null> {

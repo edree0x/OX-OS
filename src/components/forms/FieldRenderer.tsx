@@ -14,7 +14,7 @@ function EntitySelect({ field, ...rest }: { field: FieldSchema } & React.SelectH
     .map((r) => String(r.name ?? r.label ?? valueOf(r)))
     .filter(Boolean)
 
-  const base = 'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-500/20'
+  const base = 'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary-soft)] dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:focus:border-[var(--brand-primary)] dark:focus:ring-[var(--brand-primary-soft)]'
 
   if (isLoading) {
     return (
@@ -51,7 +51,7 @@ export function FieldRenderer({
   React.SelectHTMLAttributes<HTMLSelectElement> &
   React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   const base =
-    'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-500/20'
+    'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary-soft)] dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:focus:border-[var(--brand-primary)] dark:focus:ring-[var(--brand-primary-soft)]'
   const tone = error ? 'border-red-400' : ''
 
   switch (field.type) {

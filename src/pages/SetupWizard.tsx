@@ -1,13 +1,17 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { SECTOR_LIST, buildConfig } from '../config/presets'
+import { SECTOR_LIST, buildConfig, mergeFeatureEntities } from '../config/presets'
 import { useConfigStore } from '../stores/configStore'
 import { useAuthStore } from '../stores/authStore'
 import { Card, Button } from '../components/ui/primitives'
 import { Icon } from '../components/ui/Icon'
 import { notify } from '../components/ui/Toast'
+import FeatureFlagsPicker from '../components/setup/FeatureFlagsPicker'
+import { BrandLogo } from '../components/branding/BrandLogo'
+import type { FeatureFlags, CompanyProfile } from '../types'
 
-const STEPS = ['Sector', 'Details', 'Confirm']
+const STEPS = ['Sector', 'Business', 'Features', 'Confirm']
+const PRESETS = ['#6366f1', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6', '#f43f5e', '#0f172a', '#2563eb']
 
 export default function SetupWizard() {
   const saveConfig = useConfigStore((s) => s.setConfig)
@@ -18,6 +22,20 @@ export default function SetupWizard() {
   const [sector, setSector] = useState(SECTOR_LIST[0].id)
   const [appName, setAppName] = useState('')
   const [currency, setCurrency] = useState('USD')
+  const [companyName, setCompanyName] = useState('')
+  const [tagline, setTagline] = useState('')
+  const [phone, setPhone] = useState('')
+  const [primary, setPrimary] = useState('#6366f1')
+  const [accent, setAccent] = useState('#0ea5e9')
+  const [flags, setFlags] = useState<Partial<FeatureFlags>>({
+    inventory: 'basic',
+    accounting: 'basic',
+    purchasing: 'none',
+    customerCredit: 'none',
+    branches: 'none',
+    workflow: 'none',
+    reports: 'basic',
+  })
 
   const preset = SECTOR_LIST.find((s) => s.id === sector)!
   const next = () => setStep((s) => s + 1)
@@ -32,6 +50,16 @@ export default function SetupWizard() {
       customEntities: [],
       features: { auth: true, reports: true, pos: !!preset.posEntityId, rbac: true },
     })
+    config.entities = mergeFeatureEntities(config.entities, flags)
+    const company: CompanyProfile = {
+      name: companyName.trim() || undefined,
+      tagline: tagline.trim() || undefined,
+      phone: phone.trim() || undefined,
+      logoText: preset.label,
+    }
+    config.company = company
+    config.branding = { primaryColor: primary, accentColor: accent }
+    config.featureFlags = flags
     saveConfig(config)
     if (currency !== 'USD') updateConfig({ currency })
     try {
@@ -43,11 +71,14 @@ export default function SetupWizard() {
     navigate('/')
   }
 
+  const field = 'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100'
+  const label = 'block text-sm font-medium text-slate-700 dark:text-slate-200'
+
   return (
     <div className="flex min-h-full items-center justify-center bg-slate-100 p-4">
       <Card className="w-full max-w-2xl p-6">
         <div className="mb-4 flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 font-bold text-white">E</div>
+          <BrandLogo className="h-9 w-9" />
           <div>
             <h1 className="text-lg font-semibold text-slate-800">Setup Wizard</h1>
             <p className="text-xs text-slate-400">
@@ -75,19 +106,49 @@ export default function SetupWizard() {
         )}
 
         {step === 1 && (
-          <div className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-slate-700">Business name</label>
-              <input value={appName} onChange={(e) => setAppName(e.target.value)} placeholder={preset.label} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+              <label className={label}>App / business name</label>
+              <input value={appName} onChange={(e) => setAppName(e.target.value)} placeholder={preset.label} className={field} />
             </div>
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-slate-700">Currency</label>
-              <input value={currency} onChange={(e) => setCurrency(e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+              <label className={label}>Currency</label>
+              <input value={currency} onChange={(e) => setCurrency(e.target.value)} className={field} />
+            </div>
+            <div className="space-y-1">
+              <label className={label}>Legal company name (optional)</label>
+              <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} className={field} />
+            </div>
+            <div className="space-y-1">
+              <label className={label}>Tagline (optional)</label>
+              <input value={tagline} onChange={(e) => setTagline(e.target.value)} className={field} />
+            </div>
+            <div className="space-y-1">
+              <label className={label}>Phone (optional)</label>
+              <input value={phone} onChange={(e) => setPhone(e.target.value)} className={field} />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className={label}>Primary color</label>
+              <div className="mt-1 flex flex-wrap items-center gap-2">
+                {PRESETS.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => setPrimary(c)}
+                    aria-label={`Set primary color ${c}`}
+                    className={`h-8 w-8 rounded-full border-2 ${primary === c ? 'border-slate-800' : 'border-slate-200'}`}
+                    style={{ background: c }}
+                  />
+                ))}
+                <input type="color" value={primary} onChange={(e) => setPrimary(e.target.value)} className="h-8 w-10 cursor-pointer rounded border border-slate-300" />
+              </div>
             </div>
           </div>
         )}
 
-        {step === 2 && (
+        {step === 2 && <FeatureFlagsPicker value={flags} onChange={setFlags} />}
+
+        {step === 3 && (
           <div className="space-y-2 text-sm">
             <p>
               <span className="text-slate-400">Sector:</span> <span className="font-medium text-slate-700">{preset.label}</span>
@@ -98,7 +159,15 @@ export default function SetupWizard() {
             <p>
               <span className="text-slate-400">Currency:</span> <span className="font-medium text-slate-700">{currency}</span>
             </p>
+            {companyName && (
+              <p>
+                <span className="text-slate-400">Company:</span> <span className="font-medium text-slate-700">{companyName}</span>
+              </p>
+            )}
             <p className="text-slate-400">Modules: {preset.entities.map((e) => e.name).join(', ')}</p>
+            <p className="text-slate-400">
+              Enabled: {Object.entries(flags).filter(([, v]) => v !== 'none').length} modules
+            </p>
             {preset.views.includes('tablemap') && <p className="text-slate-400">Table map enabled.</p>}
             {preset.views.includes('kanban') && <p className="text-slate-400">Kanban board enabled.</p>}
             <p className="rounded-lg bg-indigo-50 p-3 text-xs text-indigo-700">

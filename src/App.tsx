@@ -3,6 +3,7 @@ import AppRoutes from './app/router'
 import { useAppConfig } from './hooks/useAppConfig'
 import { seedForConfig } from './services/seedService'
 import { ensureDefaultUsers } from './services/userService'
+import { applyBranding } from './lib/branding'
 
 export default function App() {
   const config = useAppConfig()
@@ -12,6 +13,7 @@ export default function App() {
     void ensureDefaultUsers()
     if (config && !seeded.current) {
       seeded.current = true
+      applyBranding(config.branding)
       const flag = `seeded:${config.sector}:${config.appName}`
       if (!localStorage.getItem(flag)) {
         seedForConfig(config).then(() => localStorage.setItem(flag, '1'))

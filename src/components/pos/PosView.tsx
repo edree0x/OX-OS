@@ -186,10 +186,18 @@ function PaymentDialog({
 function Receipt({ data, configName, onClose }: { data: ReceiptData; configName: string; onClose: () => void }) {
   const paid = data.tenders.reduce((s, t) => s + t.amount, 0)
   const change = Math.max(0, paid - data.total)
+  const config = useAppConfig()
+  const company = config?.company
+  const title = company?.name || company?.legalName || configName
   const content = (
     <div className="p-3 text-xs leading-relaxed">
       <div className="text-center">
-        <p className="text-[13px] font-bold uppercase tracking-wide">{configName}</p>
+        {company?.logo && (
+          <img src={company.logo} alt="" className="mx-auto mb-1 h-12 w-12 rounded object-contain" />
+        )}
+        <p className="text-[13px] font-bold uppercase tracking-wide">{title}</p>
+        {(company?.address || company?.phone) && <p className="mt-0.5">{company?.phone}</p>}
+        {company?.receiptHeader && <p className="mt-0.5">{company.receiptHeader}</p>}
         <p className="mt-0.5">{new Date(data.date).toLocaleString()}</p>
         {data.table && <p>Table: {data.table}</p>}
         <p className="mt-1 font-mono text-[11px]">#{data.invoiceNo}</p>
@@ -255,8 +263,8 @@ function Receipt({ data, configName, onClose }: { data: ReceiptData; configName:
         )}
       </div>
       <div className="my-2 border-t border-dashed border-slate-300" />
-      <p className="text-center">{configName}</p>
-      <p className="text-center text-[10px] text-slate-400">Thank you!</p>
+      <p className="text-center">{company?.name || company?.legalName || configName}</p>
+      <p className="text-center text-[10px] text-slate-400">{company?.receiptFooter || 'Thank you!'}</p>
     </div>
   )
 
@@ -273,7 +281,7 @@ function Receipt({ data, configName, onClose }: { data: ReceiptData; configName:
           <Button
             onClick={async () => {
               try {
-                await exportA4(data, configName)
+                await exportA4(data, configName, config?.company)
                 notify('A4 invoice downloaded', 'success')
               } catch {
                 notify('Could not generate invoice', 'error')

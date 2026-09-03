@@ -8,7 +8,7 @@ export default function SearchBar({ value, onChange }: { value: string; onChange
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Search…"
-        className="w-64 rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-500/20"
+        className="w-64 rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm outline-none focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary-soft)] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-[var(--brand-primary)] dark:focus:ring-[var(--brand-primary-soft)]"
       />
     </div>
   )

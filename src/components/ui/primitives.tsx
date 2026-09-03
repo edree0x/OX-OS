@@ -6,7 +6,7 @@ type Size = 'sm' | 'md' | 'lg'
 type ModalSize = 'sm' | 'md' | 'lg' | 'xl'
 
 const VARIANTS: Record<Variant, string> = {
-  primary: 'bg-indigo-600 text-white hover:bg-indigo-700',
+  primary: 'bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)]',
   outline:
     'border border-slate-300 text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700',
   danger: 'bg-red-600 text-white hover:bg-red-700',
@@ -63,7 +63,7 @@ export function Badge({ children, tone = 'slate' }: { children: ReactNode; tone?
 export function Spinner({ className = '' }: { className?: string }) {
   return (
     <div
-      className={`h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-indigo-600 dark:border-slate-600 dark:border-t-indigo-400 ${className}`}
+      className={`h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-[var(--brand-primary)] dark:border-slate-600 dark:border-t-[var(--brand-primary)] ${className}`}
     />
   )
 }

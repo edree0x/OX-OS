@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 import { Card, Button } from '../components/ui/primitives'
 import { Icon } from '../components/ui/Icon'
+import { BrandLogo } from '../components/branding/BrandLogo'
 
 export default function LoginPage() {
   const login = useAuthStore((s) => s.login)
@@ -26,7 +27,7 @@ export default function LoginPage() {
     <div className="flex min-h-full items-center justify-center bg-slate-100 p-4 dark:bg-slate-900">
       <Card className="w-full max-w-sm p-6">
         <div className="mb-4 flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 font-bold text-white">E</div>
+          <BrandLogo className="h-9 w-9" />
           <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Sign in</h1>
         </div>
         <form onSubmit={submit} className="space-y-3">

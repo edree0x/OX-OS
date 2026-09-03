@@ -1,5 +1,6 @@
 import { indexDbDataSource as db } from '../lib/db'
 import { uid } from '../lib/utils'
+import { logAudit } from './auditService'
 
 export interface ListParams {
   search?: string
@@ -49,17 +50,27 @@ export async function getEntity(entityId: string, id: string) {
 export async function createEntity(entityId: string, data: Record<string, unknown>) {
   const record = { ...data, id: uid(), createdAt: Date.now() }
   await db.put(entityId, record)
+  await logAudit({ action: 'create', collection: entityId, recordId: record.id, after: record })
   return record
 }
 
 export async function updateEntity(entityId: string, id: string, data: Record<string, unknown>) {
+  const before = await db.get(entityId, id)
   const record = { ...data, id, updatedAt: Date.now() }
   await db.put(entityId, record)
+  await logAudit({
+    action: 'update',
+    collection: entityId,
+    recordId: id,
+    before: (before ?? undefined) as Record<string, unknown> | undefined,
+    after: record,
+  })
   return record
 }
 
 export async function deleteEntity(entityId: string, id: string) {
   await db.delete(entityId, id)
+  await logAudit({ action: 'delete', collection: entityId, recordId: id })
 }
 
 export async function listAll(entityId: string): Promise<Record<string, unknown>[]> {

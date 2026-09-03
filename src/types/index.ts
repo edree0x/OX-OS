@@ -15,7 +15,10 @@ export type FieldType =
   | 'image-preview'
 
 /** Extra capabilities that can be granted per user (beyond the role baseline). */
-export type PermissionKey = 'manageFields'
+export type PermissionKey = 'manageFields' | 'audit' | 'approvals' | 'company'
+
+/** Capability tiers a user can choose when enabling a module. */
+export type FeatureTier = 'none' | 'basic' | 'advanced'
 
 export interface FieldSchema {
   key: string
@@ -110,6 +113,51 @@ export interface AppConfig {
   calendarEntityId?: string
   kanbanEntityId?: string
   createdAt: string
+  /** White-label company identity. */
+  company?: CompanyProfile
+  /** Visual identity driving dynamic CSS tokens. */
+  branding?: Branding
+  /** Per-module capability tiers chosen by the user. */
+  featureFlags?: Partial<FeatureFlags>
+}
+
+/** White-label / company identity. Optional — platform falls back to neutral tokens. */
+export interface CompanyProfile {
+  name?: string
+  legalName?: string
+  tagline?: string
+  address?: string
+  phone?: string
+  email?: string
+  website?: string
+  taxId?: string
+  /** Data-URL (or URL) of the uploaded logo. */
+  logo?: string
+  /** Short text used as a fallback wordmark when no logo is provided. */
+  logoText?: string
+  /** Appears on the printed header of receipts/invoices/reports. */
+  receiptHeader?: string
+  /** Appears on the printed footer. */
+  receiptFooter?: string
+}
+
+/** Visual identity. Drive dynamic CSS tokens instead of hard-coded indigo. */
+export interface Branding {
+  primaryColor: string
+  accentColor: string
+  /** When true, a neutral/gray palette is forced (used for white-label neutral mode). */
+  neutral?: boolean
+}
+
+/** Per-module depth chosen by the user at setup, changeable later in Settings. */
+export interface FeatureFlags {
+  inventory: FeatureTier
+  accounting: FeatureTier
+  purchasing: FeatureTier
+  customerCredit: FeatureTier
+  branches: FeatureTier
+  workflow: FeatureTier
+  reports: FeatureTier
 }
 
 export type Role = 'admin' | 'manager' | 'cashier' | 'staff'
