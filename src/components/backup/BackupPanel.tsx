@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
   exportBundle,
   downloadBundle,
@@ -22,7 +21,6 @@ function formatTime(ts: number): string {
 }
 
 export default function BackupPanel() {
-  const navigate = useNavigate()
   const setTheme = useThemeStore((s) => s.setTheme)
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -94,7 +92,7 @@ export default function BackupPanel() {
       useConfigStore.setState({ config: restored })
 
       notify('Backup restored successfully', 'success')
-      setTimeout(() => navigate('/'), 600)
+      setTimeout(() => window.location.reload(), 600)
     } catch (e) {
       notify('Restore failed: ' + String((e as Error).message), 'error')
     } finally {
@@ -119,7 +117,7 @@ export default function BackupPanel() {
     try {
       await restoreSnapshot(snap.id)
       notify('Local snapshot restored', 'success')
-      setTimeout(() => navigate('/'), 600)
+      setTimeout(() => window.location.reload(), 600)
     } catch (e) {
       notify('Restore failed: ' + String((e as Error).message), 'error')
     } finally {
