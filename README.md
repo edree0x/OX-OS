@@ -241,5 +241,3 @@ Field types: `text`, `number`, `email`, `date`, `datetime-local`, `time`, `selec
 - [jsPDF](https://parall.ax/products/jspdf) — PDF generation
 - [Lucide](https://lucide.dev/) — Icon library
 =======
-# OX-OS
->>>>>>> a09633f7cafd539f65502c0a3ef204056e71de90
